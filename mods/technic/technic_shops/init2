@@ -1,0 +1,75 @@
+minetest.register_node("technic_shops:lv_slot_machine", {
+	description = "LV Slot Machine",
+	tiles = {"default_dirt.png"},
+	inventory_image = minetest.inventorycube("glowdirt_glowdirt.png","glowdirt_glowdirt.png","glowdirt_glowdirt.png"),
+	wield_image = minetest.inventorycube("glowdirt_glowdirt.png","glowdirt_glowdirt.png","glowdirt_glowdirt.png"),
+	groups = {cracky=3},
+	sounds = default.node_sound_dirt_defaults(),
+	
+})
+
+minetest.register_craft({
+	output = 'technic_shops:lv_slot_machine',
+	recipe = {
+		{'technic:carbon_steel_ingot', 'technic:iron_locked_chest', 'technic:carbon_steel_ingot'},
+		{'technic_shops:traders_scale', 'mesecons_luacontroller:luacontroller0000', 'technic_shops:traders_scale'},
+		{'technic:carbon_steel_ingot', 'technic:lv_cable0', 'technic:carbon_steel_ingot'},
+	}
+})
+
+minetest.register_node("technic_shops:hv_materializer", {
+	description = "HV Materializer",
+	tiles = {"default_dirt.png"},
+	inventory_image = minetest.inventorycube("glowdirt_glowdirt.png","glowdirt_glowdirt.png","glowdirt_glowdirt.png"),
+	wield_image = minetest.inventorycube("glowdirt_glowdirt.png","glowdirt_glowdirt.png","glowdirt_glowdirt.png"),
+	groups = {cracky=3},
+	sounds = default.node_sound_dirt_defaults(),
+	
+})
+
+minetest.register_craft({
+	output = 'technic_shops:hv_materializer',
+	recipe = {
+		{'technic:stainless_steel_ingot', 'technic_shops:lv_slot_machine', 'technic:stainless_steel_ingot'},
+		{'default:goldblock', 'technic:supply_converter', 'default:mese'},
+		{'technic:stainless_steel_ingot', 'technic:hv_cable0', 'technic:stainless_steel_ingot'},
+	}
+})
+
+minetest.register_craft({
+	output = 'technic_shops:hv_materializer',
+	recipe = {
+		{'technic:stainless_steel_ingot', 'technic_shops:lv_slot_machine', 'technic:stainless_steel_ingot'},
+		{'default:mese', 'technic:supply_converter', 'default:goldblock'},
+		{'technic:stainless_steel_ingot', 'technic:hv_cable0', 'technic:stainless_steel_ingot'},
+	}
+})
+
+minetest.register_node("technic_shops:mv_body_scanner", {
+	description = "MV Body Scanner",
+	tiles = {"default_dirt.png"},
+	inventory_image = minetest.inventorycube("glowdirt_glowdirt.png","glowdirt_glowdirt.png","glowdirt_glowdirt.png"),
+	wield_image = minetest.inventorycube("glowdirt_glowdirt.png","glowdirt_glowdirt.png","glowdirt_glowdirt.png"),
+	groups = {cracky=3},
+	sounds = default.node_sound_dirt_defaults(),
+	
+})
+
+minetest.register_craft({
+	output = 'technic_shops:mv_body_scanner',
+	recipe = {
+		{'default:glass', 'mesecons_lightstone:lightstone_red_off', 'default:glass'},
+		{'mesecons_detector:node_detector_off', 'mesecons_luacontroller:luacontroller0000', 'mesecons_detector:object_detector_off'},
+		{'default:glass', 'technic:mv_cable0', 'default:glass'},
+	}
+})
+
+minetest.register_craft({
+	output = 'technic_shops:mv_body_scanner',
+	recipe = {
+		{'default:glass', 'mesecons_lightstone:lightstone_red_off', 'default:glass'},
+		{'mesecons_detector:object_detector_off', 'mesecons_luacontroller:luacontroller0000', 'mesecons_detector:node_detector_off'},
+		{'default:glass', 'technic:mv_cable0', 'default:glass'},
+	}
+})
+
