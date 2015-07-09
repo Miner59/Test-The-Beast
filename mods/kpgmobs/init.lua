@@ -28,6 +28,27 @@ minetest.register_craft({
 	}
 })
 
+minetest.register_node("kpgmobs:manger", {
+	description = "Manger",
+	drawtype = "plantlike",
+	visual_scale = 1.2,
+	tiles ={"manger.png"},
+	inventory_image = "manger.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	groups = {oddly_breakable_by_hand=2},
+	sounds = default.node_sound_defaults(),
+})
+
+minetest.register_craft({
+	output = 'kpgmobs:manger',
+	recipe = {
+		{'group:stick','farming:wheat','group:stick'},
+		{'','group:stick',''},
+		{'group:stick','','group:stick'}
+	}
+})
 
 --HORSE go go goooo :)
 local horse = {
@@ -998,7 +1019,7 @@ minetest.register_globalstep(function(dtime)
 					local boots=players[name]["boots"]
 					local floor=players[name]["floor"]
 					local water=players[name]["water"]
-						if player:get_breath()~=nil or default.player_attached[name] == true then
+						if player:get_breath()~=11 and player:get_breath()~=nil or default.player_attached[name] == true then
 						if not water then
 							players[name]["water"]=true
 							water=true
@@ -1010,6 +1031,8 @@ minetest.register_globalstep(function(dtime)
 						end
 					end
 					if not water then
+						local node = minetest.get_node({x=pos.x,y=pos.y,z=pos.z})
+						local node1 = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
 						if minetest.get_item_group(node1.name, "fast")>0 or minetest.get_item_group(node.name, "fast")>0 then
 							floor=1
 						elseif floor==1 then

@@ -442,7 +442,7 @@ minetest.sound_play(
             "cuckoo",
             {
                pos = pos,
-               gain = 9.0,
+               gain = 15.0,
                max_hear_distance = 22
             });
 end, pos)
@@ -451,7 +451,7 @@ minetest.sound_play(
             "cuckoo",
             {
                pos = pos,
-               gain = 9.0,
+               gain = 15.0,
                max_hear_distance = 22
             });
 end, pos)
@@ -460,7 +460,7 @@ minetest.sound_play(
             "cuckoo",
             {
                pos = pos,
-               gain = 9.0,
+               gain = 15.0,
                max_hear_distance = 22
             });
 end, pos)
@@ -469,7 +469,7 @@ minetest.sound_play(
             "cuckoo",
             {
                pos = pos,
-               gain = 9.0,
+               gain = 15.0,
                max_hear_distance = 22
             });
 end, pos)
@@ -478,7 +478,7 @@ minetest.sound_play(
             "cuckoo",
             {
                pos = pos,
-               gain = 9.0,
+               gain = 15.0,
                max_hear_distance = 22
             });
 end, pos)
@@ -487,7 +487,7 @@ minetest.sound_play(
             "cuckoo",
             {
                pos = pos,
-               gain = 9.0,
+               gain = 15.0,
                max_hear_distance = 22
             });
 end, pos)

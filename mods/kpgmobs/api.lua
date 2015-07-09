@@ -557,6 +557,80 @@ function kpgmobs:register_spawn(name, nodes, max_light, min_light, chance, activ
 		chance = chance,
 		action = function(pos, node, _, active_object_count_wider)
 			if active_object_count_wider > active_object_count then
+			pos.y = pos.y+1
+			if active_object_count_wider > active_object_count*3 or (minetest.get_node(pos).name~="kpgmobs:manger" and
+				name~="kpgmobs:rat" and name~="kpgmobs:bee" and name~="kpgmobs:jeraf" and name~="kpgmobs:horsearah1" and name~="kpgmobs:wolf") or 
+				(minetest.get_node(pos).name~="kpgmobs:uley" and name~="kpgmobs:bee") then
+			if not kpgmobs.spawning_mobs[name] then
+				return
+			end
+			if not minetest.env:get_node_light(pos) then
+				return
+			end
+			if minetest.env:get_node_light(pos) > max_light then
+				return
+			end
+			if minetest.env:get_node_light(pos) < min_light then
+				return
+			end
+			if pos.y > max_height then
+				return
+			end
+			if minetest.env:get_node({x=pos.x,y=pos.y+1,z=pos.z}).name ~= "air" then
+				return
+			end
+			if spawn_func and not spawn_func(pos, node) then
+				return
+			end
+			if name~="kpgmobs:bee" then
+			local feeding=false
+			for _, object in ipairs(minetest.env:get_objects_inside_radius(pos, 1)) do
+				local luaentity = object:get_luaentity()
+				if not object:is_player() and luaentity and luaentity.name == "__builtin:item" and luaentity.itemstring ~= "" then
+				if luaentity.itemstring=="default:apple" or luaentity.itemstring=="farming:wheat" or luaentity.itemstring=="farming:seed_wheat" then
+					feeding=true
+				end
+				end
+			end
+			if not feeding then
+				return
+			end
+			end
+
+			if minetest.setting_getbool("display_mob_spawn") then
+				minetest.chat_send_all("[kpgmobs] Add "..name.." at "..minetest.pos_to_string(pos))
+			end
+			pos={x=pos.x-1+math.random(0,2),y=pos.y-1,z=pos.z-1+math.random(0,2)}
+			local nname=minetest.get_node(pos).name
+			if nname~="default:dirt" and nname~="default:sand" and nname~="default:dirt_with_grass" and nname~="paragenv7:dirt"
+				and nname~="default:desert_sand" and nname~="default:stone" and nname~="farming:soil" and nname~="farming:soil_wet" then
+				return
+			end
+			pos={x=pos.x,y=pos.y-1,z=pos.z}
+			nname=minetest.get_node(pos).name
+			if nname~="air" then
+				return
+			end
+
+				minetest.env:add_entity(pos, name)
+			if math.random(1,2)==1 then
+				return
+			end
+			pos={x=pos.x-1+math.random(0,2),y=pos.y-1,z=pos.z-1+math.random(0,2)}
+			local nname=minetest.get_node(pos).name
+			if nname~="default:dirt" and nname~="default:sand" and nname~="default:dirt_with_grass" and nname~="paragenv7:dirt"
+				and nname~="default:desert_sand" and nname~="default:stone" and nname~="farming:soil" and nname~="farming:soil_wet" then
+				return
+			end
+			pos={x=pos.x,y=pos.y-1,z=pos.z}
+			nname=minetest.get_node(pos).name
+			if nname~="air" then
+				return
+			end
+
+				minetest.env:add_entity(pos, name)
+				return
+			end
 				return
 			end
 			if not kpgmobs.spawning_mobs[name] then

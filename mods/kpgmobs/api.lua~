@@ -114,21 +114,21 @@ function kpgmobs:register_mob(name, def)
 		
 		on_step = function(self, dtime)
 		
-		--spanch
-		    if self.type == "spanch" then
-			if self.state == "walk" then
-                self.object:set_properties({
-				textures = {"mobs_spanchbob_a1.png"},
-				mesh = "mobs_spanchbob.x",
-			})
-	           else
-        	self.object:set_properties({
-				textures = {"mobs_spanchbob.png"},
-				mesh = "mobs_spanchbob.x",
-			})
-	           end
-		    
-			end
+		--spanch ??? old code ???
+--		    if self.type == "spanch" then
+--			if self.state == "walk" then
+--              self.object:set_properties({
+--				textures = {"mobs_spanchbob_a1.png"},
+--				mesh = "mobs_spanchbob.x",
+--			})
+--	           else
+--        	self.object:set_properties({
+--				textures = {"mobs_spanchbob.png"},
+--				mesh = "mobs_spanchbob.x",
+--			})
+--	           end
+--		    
+--			end
 		
 			if self.type == "monster" and minetest.setting_getbool("only_peaceful_mobs") then
 				self.object:remove()
@@ -487,55 +487,62 @@ function kpgmobs:register_mob(name, def)
 		
 		on_punch = function(self, hitter)
 			if self.object:get_hp() <= 0 then
-				if hitter
-then
-local arrow=false
+				if hitter then
+					local arrow=false
 					for _,drop in ipairs(self.drops) do
 						if drop.chance==1 or math.random(1, drop.chance) == 1 or (arrow and drop.chance>10000) then
-if hitter:is_player() and hitter:get_inventory() then
-							hitter:get_inventory():add_item("main", ItemStack(drop.name.." "..math.random(drop.min, drop.max)))
-else
-local tfg=true
-if drop.chance>10000 then
-tfg=false
-if math.random(1, drop.chance-10000) == 1 then
-tfg=true
-end
-end
-if tfg then
-if hitter:get_entity_name()=="throwing:arrow_fire_entity" and drop.name=="kpgmops:meat_raw" then
-drop.name="kpgmops:meat"
-end
-if self.object:get_entity_name()=="kpgmobs:sheep" then
-local wool=false
-if not hitter:get_luaentity().naked then
-wool=true
-end
-if (hitter:get_entity_name()=="throwing:golden_arrow_entity" or hitter:get_entity_name()=="throwing:arrow_steal_entity") and hitter:get_luaentity().player~=nil and hitter:get_luaentity().player:get_inventory()~=nil then
-if wool then
-hitter:get_luaentity().player:get_inventory():add_item("main",ItemStack("wool:white"))
-end
-hitter:get_luaentity().player:get_inventory():add_item("main",ItemStack(drop.name.." 1"))
-else
-if wool then
-minetest.add_item(self.object:getpos(), ItemStack("wool:white"))
-end
-minetest.add_item(self.object:getpos(), ItemStack(drop.name.." 1"))
-end
-else
-if (hitter:get_entity_name()=="throwing:golden_arrow_entity" or hitter:get_entity_name()=="throwing:arrow_steal_entity") and hitter:get_luaentity().player~=nil and hitter:get_luaentity().player:get_inventory()~=nil then
-hitter:get_luaentity().player:get_inventory():add_item("main",ItemStack(drop.name.." "..math.random(drop.min, drop.max)))
-else
-minetest.add_item(self.object:getpos(), ItemStack(drop.name.." "..math.random(drop.min, drop.max)))
-end
-end
-arrow=true
-end
-end						end
+							if hitter:is_player() and hitter:get_inventory() then
+								hitter:get_inventory():add_item("main", ItemStack(drop.name.." "..math.random(drop.min, drop.max)))
+							else
+								local tfg=true
+								if drop.chance>10000 then --drop chance > 10.000=additional drop chance when hit with arrow
+									tfg=false
+									if math.random(1, drop.chance-10000) == 1 then
+										tfg=true
+									end
+								end
+								if tfg then
+									if hitter:get_entity_name()=="throwing:arrow_fire_entity" 
+										and drop.name=="kpgmops:meat_raw" then
+										drop.name="kpgmops:meat"
+									end
+									if self.object:get_entity_name()=="kpgmobs:sheep" then
+										local wool=false
+									if not hitter:get_luaentity().naked then
+										wool=true
+									end
+									if (hitter:get_entity_name()=="throwing:golden_arrow_entity" 
+										or hitter:get_entity_name()=="throwing:arrow_steal_entity") 
+										and hitter:get_luaentity().player~=nil 
+										and hitter:get_luaentity().player:get_inventory()~=nil then
+										if wool then
+											hitter:get_luaentity().player:get_inventory():add_item("main",ItemStack("wool:white"))
+										end
+										hitter:get_luaentity().player:get_inventory():add_item("main",ItemStack(drop.name.." 1"))
+									else
+										if wool then
+											minetest.add_item(self.object:getpos(), ItemStack("wool:white"))
+										end
+										minetest.add_item(self.object:getpos(), ItemStack(drop.name.." 1"))
+									end
+								else
+									if (hitter:get_entity_name()=="throwing:golden_arrow_entity" 
+										or hitter:get_entity_name()=="throwing:arrow_steal_entity") 
+										and hitter:get_luaentity().player~=nil 
+										and hitter:get_luaentity().player:get_inventory()~=nil then
+										hitter:get_luaentity().player:get_inventory():add_item("main",ItemStack(drop.name.." "..math.random(drop.min, drop.max)))
+									else
+										minetest.add_item(self.object:getpos(), ItemStack(drop.name.." "..math.random(drop.min, drop.max)))
+									end
+								end
+								arrow=true
+							end
+						end
 					end
 				end
 			end
-		end,
+		end
+	end,
 		
 	})
 end
@@ -550,6 +557,80 @@ function kpgmobs:register_spawn(name, nodes, max_light, min_light, chance, activ
 		chance = chance,
 		action = function(pos, node, _, active_object_count_wider)
 			if active_object_count_wider > active_object_count then
+			pos.y = pos.y+1
+			if active_object_count_wider > active_object_count*3 or (minetest.get_node(pos).name~="kpgmobs:manger" and
+				name~="kpgmobs:rat" and name~="kpgmobs:bee" and name~="kpgmobs:jeraf" and name~="kpgmobs:horsearah1" and name~="kpgmobs:wolf") or 
+				(minetest.get_node(pos).name~="kpgmobs:uley" and name~="kpgmobs:bee") then
+			if not kpgmobs.spawning_mobs[name] then
+				return
+			end
+			if not minetest.env:get_node_light(pos) then
+				return
+			end
+			if minetest.env:get_node_light(pos) > max_light then
+				return
+			end
+			if minetest.env:get_node_light(pos) < min_light then
+				return
+			end
+			if pos.y > max_height then
+				return
+			end
+			if minetest.env:get_node({x=pos.x,y=pos.y+1,z=pos.z}).name ~= "air" then
+				return
+			end
+			if spawn_func and not spawn_func(pos, node) then
+				return
+			end
+			if name~="kpgmobs:bee" then
+			local feeding=false
+			for _, object in ipairs(minetest.env:get_objects_inside_radius(pos, 1)) do
+				local luaentity = object:get_luaentity()
+				if not object:is_player() and luaentity and luaentity.name == "__builtin:item" and luaentity.itemstring ~= "" then
+				if luaentitiy.itemstring=="default:apple" or luaentitiy.itemstring=="farming:wheat" or luaentitiy.itemstring=="farming:seed_wheat" then
+					feeding=true
+				end
+				end
+			end
+			if not feeding then
+				return
+			end
+			end
+
+			if minetest.setting_getbool("display_mob_spawn") then
+				minetest.chat_send_all("[kpgmobs] Add "..name.." at "..minetest.pos_to_string(pos))
+			end
+			pos={x=pos.x-1+math.random(0,2),y=pos.y-1,z=pos.z-1+math.random(0,2)}
+			local nname=minetest.get_node(pos).name
+			if nname~="default:dirt" and nname~="default:sand" and nname~="default:dirt_with_grass" and nname~="paragenv7:dirt"
+				and nname~="default:desert_sand" and nname~="default:stone" and nname~="farming:soil" and nname~="farming:soil_wet" then
+				return
+			end
+			pos={x=pos.x,y=pos.y-1,z=pos.z}
+			nname=minetest.get_node(pos).name
+			if nname~="air" then
+				return
+			end
+
+				minetest.env:add_entity(pos, name)
+			if math.random(1,2)==1 then
+				return
+			end
+			pos={x=pos.x-1+math.random(0,2),y=pos.y-1,z=pos.z-1+math.random(0,2)}
+			local nname=minetest.get_node(pos).name
+			if nname~="default:dirt" and nname~="default:sand" and nname~="default:dirt_with_grass" and nname~="paragenv7:dirt"
+				and nname~="default:desert_sand" and nname~="default:stone" and nname~="farming:soil" and nname~="farming:soil_wet" then
+				return
+			end
+			pos={x=pos.x,y=pos.y-1,z=pos.z}
+			nname=minetest.get_node(pos).name
+			if nname~="air" then
+				return
+			end
+
+				minetest.env:add_entity(pos, name)
+				return
+			end
 				return
 			end
 			if not kpgmobs.spawning_mobs[name] then
