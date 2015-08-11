@@ -130,6 +130,17 @@ minetest.register_node("default:dirt", {
 })
 
 minetest.register_abm({
+	nodenames = {"monorail:meserail"},
+	interval = 5,
+	chance = 1,
+	action = function(pos, node)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("cart_acceleration", "2.32")
+		end
+	end
+})
+
+minetest.register_abm({
 	nodenames = {"default:cloud"},
 	interval = 100,
 	chance = 200,
@@ -1396,7 +1407,7 @@ minetest.register_node("default:grass_1", {
 	walkable = false,
 	is_ground_content = true,
 	buildable_to = true,
-	groups = {snappy=3,flammable=3,,grass=1,flora=1,attached_node=1},
+	groups = {snappy=3,flammable=3,grass=1,flora=1,attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",

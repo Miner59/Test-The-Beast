@@ -106,6 +106,7 @@ technic.register_alloy_recipe("default:copper_ingot",  2, "technic:zinc_ingot", 
 technic.register_alloy_recipe("default:dirt",          1, "default:grass_1",      1, "paragenv7:drygrass",         1)
 technic.register_alloy_recipe("default:sand",          2, "technic:coal_dust",      2, "technic:silicon_wafer",         1)
 technic.register_alloy_recipe("technic:silicon_wafer", 1, "technic:gold_dust",      1, "technic:doped_silicon_wafer",   1)
+technic.register_alloy_recipe("technic:uranium", 1, "default:stone",      4, "liarg:stone",   4)
 
 local tube = {
 	insert_object = function(pos, node, stack, direction)

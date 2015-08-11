@@ -487,7 +487,7 @@ minetest.register_craft( {
 		"homedecor:shutter_oak",
 		"homedecor:shutter_oak",
 		"homedecor:shutter_oak",
-		"unifieddyes:light_blue"
+		"dye:cyan"
 	},
 })
 

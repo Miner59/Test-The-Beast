@@ -1,40 +1,41 @@
 minetest.register_tool("technic:diving_gear", {
-	description = ("Diving gear"),
+	description = ("Diving Gear"),
 	inventory_image = "diving_gear.png",
+	wear_represents = "air_left"
 })
 
 minetest.register_craftitem("technic:diving_gear_used", {
-	description = ("Diving gear (air empty)"),
+	description = ("Diving Gear (air empty)"),
 	inventory_image = "diving_gear.png",
 })
 
 minetest.register_craftitem("technic:diving_helmet", {
-	description = ("Diving helmet"),
+	description = ("Diving Helmet"),
 	inventory_image = "diving_helmet.png",
 })
 
 minetest.register_craftitem("technic:diving_boots", {
-	description = ("Diving boots"),
+	description = ("Diving Boots"),
 	inventory_image = "diving_boots.png",
 })
 
 minetest.register_craftitem("technic:diving_suit_vest", {
-	description = ("Diving suit vest"),
+	description = ("Diving Suit Vest"),
 	inventory_image = "technic_rubber_vest.png",
 })
 
 minetest.register_craftitem("technic:diving_suit_trousers", {
-	description = ("Diving suit trousers"),
+	description = ("Diving Suit Trousers"),
 	inventory_image = "technic_rubber_trousers.png",
 })
 
 minetest.register_craftitem("technic:diving_suit", {
-	description = ("Diving suit"),
+	description = ("Diving Suit"),
 	inventory_image = "diving_suit.png",
 })
 
 minetest.register_craftitem("technic:gas_cylinder", {
-	description = ("Gas cylinder"),
+	description = ("Gas Cylinder"),
 	inventory_image = "technic_gas_cylinder.png",
 })
 

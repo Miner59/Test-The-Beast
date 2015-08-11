@@ -24,7 +24,7 @@ local trampoline_punch = function(pos, node)
 	minetest.add_node(pos, {name = string.sub(node.name, 1, #node.name - 1)..id})
 end
 
-local groups={dig_immediate=2, bouncy=math.random(11,37)+20, fall_damage_add_percent=-70}
+local groups={dig_immediate=2, bouncy=math.random(8,24)+67, fall_damage_add_percent=-70}
 for i = 1, 7 do
 	minetest.register_node("jumping:trampoline"..i, {
 		description = "Trampoline",
@@ -40,7 +40,7 @@ for i = 1, 7 do
 		},
 		groups = groups,
 	})
-groups={dig_immediate=2, not_in_craft_guide=1, not_in_creative_inventory=1, bouncy=math.random(11,37)+i*20, fall_damage_add_percent=-70}
+groups={dig_immediate=2, not_in_craft_guide=1, not_in_creative_inventory=1, bouncy=math.random(68,84)+i*7, fall_damage_add_percent=-70}
 end
 
 minetest.register_node("jumping:cushion", {

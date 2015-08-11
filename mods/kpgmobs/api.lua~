@@ -232,7 +232,7 @@ function kpgmobs:register_mob(name, def)
 				do_env_damage(self)
 			end
 			
-			if self.type == "monster" and minetest.setting_getbool("enable_damage") and (self.object:get_hp()<self.hp_max/2 or (not self.tamed)) then
+			if self.type == "monster" and minetest.setting_getbool("enable_damage") and (self.object:get_hp()<self.hp_max/2 or (not self.tamed) or "name==creatures:ghost" or "name==creatures:zombie") then
 				for _,player in pairs(minetest.get_connected_players()) do
 					local s = self.object:getpos()
 					local p = player:getpos()
@@ -552,15 +552,15 @@ function kpgmobs:register_spawn(name, nodes, max_light, min_light, chance, activ
 	kpgmobs.spawning_mobs[name] = true
 	minetest.register_abm({
 		nodenames = nodes,
-		neighbors = {"air"},
+		neighbors = {"air","kpgmobs:manger","kpgmobs:uley"},
 		interval = 30,
-		chance = chance,
+		chance = chance/2,
 		action = function(pos, node, _, active_object_count_wider)
-			if active_object_count_wider > active_object_count then
+			if active_object_count_wider > active_object_count or math.random(1,2)==1 then
 			pos.y = pos.y+1
-			if active_object_count_wider > active_object_count*3 or (minetest.get_node(pos).name~="kpgmobs:manger" and
+			if active_object_count_wider < active_object_count * 4 and ((minetest.get_node(pos).name~="kpgmobs:manger" and
 				name~="kpgmobs:rat" and name~="kpgmobs:bee" and name~="kpgmobs:jeraf" and name~="kpgmobs:horsearah1" and name~="kpgmobs:wolf") or 
-				(minetest.get_node(pos).name~="kpgmobs:uley" and name~="kpgmobs:bee") then
+				(minetest.get_node(pos).name~="kpgmobs:uley" and name~="kpgmobs:bee")) then
 			if not kpgmobs.spawning_mobs[name] then
 				return
 			end
@@ -583,16 +583,8 @@ function kpgmobs:register_spawn(name, nodes, max_light, min_light, chance, activ
 				return
 			end
 			if name~="kpgmobs:bee" then
-			local feeding=false
-			for _, object in ipairs(minetest.env:get_objects_inside_radius(pos, 1)) do
-				local luaentity = object:get_luaentity()
-				if not object:is_player() and luaentity and luaentity.name == "__builtin:item" and luaentity.itemstring ~= "" then
-				if luaentitiy.itemstring=="default:apple" or luaentitiy.itemstring=="farming:wheat" or luaentitiy.itemstring=="farming:seed_wheat" then
-					feeding=true
-				end
-				end
-			end
-			if not feeding then
+			local meta = minetest.env:get_meta(pos)
+			if meta==nil or meta:get_string("item")=="" or meta:get_string("item")==nil then
 				return
 			end
 			end

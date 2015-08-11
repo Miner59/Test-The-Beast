@@ -1,0 +1,296 @@
+minetest.register_node("liarg:stone", {
+	description = "Liarg Stone",
+	tiles = {"liarg_green_stone.png"},
+	is_ground_content = true,
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("liarg:tiles", {
+	description = "Liarg Tiles",
+	tiles = {"liarg_green_tiles.png"},
+	is_ground_content = true,
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_craft({
+	output = 'liarg:tiles 4',
+	recipe = {
+		{'liarg:stone', 'liarg:stone'},
+		{'liarg:stone', 'liarg:stone'},
+	}
+})
+
+local pup_nr=0
+local pup_entity={}
+
+minetest.register_tool("liarg:puppet", {
+	description = "Leather Puppet",
+	inventory_image = "liarg_puppet.png",
+	on_use = function(itemstack, user, pointed_thing)
+		if user==nil then
+			return itemstack
+		end
+		if pointed_thing.type == "object" then
+		if pointed_thing.ref~=nil then
+		if pointed_thing.ref:is_player() then
+			local meta=itemstack:get_metadata()	
+			if meta~=tostring("________"..pointed_thing.ref:get_player_name()) then
+			itemstack:set_metadata(tostring("________"..pointed_thing.ref:get_player_name()))
+--		elseif pointed_thing.ref:get_luaentity()~=nil then
+--			pup_nr=pup_nr+1
+--			itemstack:set_metadata(tostring(pup_nr))
+--			pup_entity[tostring(pup_nr)]=pointed_thing.ref
+			return itemstack
+			end
+		end
+end
+
+			if pointed_thing.type=="node" then
+				if minetest.get_node(pointed_thing.under).name=="liarg:stone" or minetest.get_node(pointed_thing.under).name=="liarg:tile" then
+					local meta1=itemstack:get_metadata()	
+					local meta2=minetest.get_meta(pointed_thing.under)
+					if meta2==nil then
+					return itemstack
+					end
+					local meta3=meta2:get_string("puppet")
+					if meta1~=nil and meta1~="" and (meta3==nil or meta3=="") then
+						meta2:set_string("puppet",meta1)
+					elseif meta3~=nil and meta3~="" and (meta1==nil or meta1=="") then
+						itemstack:set_metadata(meta3)
+					end					
+				end
+				return itemstack
+			end
+			local obj=itemstack:get_metadata()
+			if obj==nil or obj=="" then
+				itemstack:set_metadata("")
+				return itemstack
+			end
+		local entity=false
+		if string.len(obj)<10 then
+return itemstack
+--			if tonumber(obj)>pup_nr then
+--			return itemstack
+--			end
+--			obj=pup_entity[obj]
+--			if obj==nil then
+--			return itemstack
+--			end
+--			if obj:get_luaentity()==nil then
+--			return itemstack
+--			else
+--			obj=obj:get_luaentity()
+--			end
+--			entity=true
+		else 
+			local name=string.sub(obj,9)
+			obj=minetest.get_player_by_name(name)
+		end
+		if obj==nil or obj=="" then
+			return itemstack
+		end
+
+
+		local pos=obj:getpos()
+		if pos~=nil then
+			
+		local ctrl = user:get_player_control()
+		if ctrl.up then
+			local xx=0
+			local zz=0
+			local yaw=obj:get_look_yaw()
+			if yaw < 180 then
+				zz=(90-yaw)/90
+			else
+				zz=(270-yaw)/-90
+			end
+			yaw=yaw-90
+			if yaw<0 then yaw=yaw+360 end
+			if yaw < 180 then
+				xx=(90-yaw)/90
+			else
+				xx=(270-yaw)/-90
+			end
+			obj:setpos({x=pos.x+xx*2,y=pos.y,z=pos.z+zz*2})
+		end
+		if ctrl.down then
+			local xx=0
+			local zz=0
+			local yaw=obj:get_look_yaw()
+			if yaw < 180 then
+				zz=(90-yaw)/90
+			else
+				zz=(270-yaw)/-90
+			end
+			yaw=yaw-90
+			if yaw<0 then yaw=yaw+360 end
+			if yaw < 180 then
+				xx=(90-yaw)/90
+			else
+				xx=(270-yaw)/-90
+			end
+			obj:setpos({x=pos.x-xx,y=pos.y,z=pos.z-zz})
+		end
+		if ctrl.left then
+			if entity then
+			obj:setyaw(obj:getyaw()+7)
+			else
+			obj:set_look_yaw(obj:get_look_yaw()+7)
+			end
+		end
+		if ctrl.right then
+			if entity then
+			obj:setyaw(obj:getyaw()-8)
+			else
+			obj:set_look_yaw(obj:get_look_yaw()-8)
+			end
+		end
+		if ctrl.jump then
+			obj:moveto({x=pos.x,y=pos.y+1,z=pos.z})	
+		end
+		elseif entity then
+			itemstack:set_metadata("")
+		end
+	end
+	return itemstack
+	end,
+})
+
+minetest.register_craft({
+	output = "liarg:puppet",
+	recipe = {
+		{"",               "kpgmobs:leather", ""},
+		{"kpgmobs:leather", "kpgmobs:leather",    "kpgmobs:leather"},
+		{"",               "kpgmobs:leather", ""}
+	},
+})
+
+minetest.register_craft({
+	output = 'liarg:puppet',
+	type="shapeless",
+	recipe = {
+		"liarg:puppet"
+	}
+})
+
+
+		if minetest.get_modpath("moreblocks") then
+
+			register_stair(
+				"liarg",
+				"stone",
+				"liarg:stone",
+				{cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_stone.png",
+					"liarg_green_stone.png",
+					"liarg_green_stone.png",
+				},
+				"Liarg Stone",
+				"liarg_stone",
+				0
+			)
+
+			register_slab(
+				"liarg",
+				"stone",
+				"liarg:stone",
+				{cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_stone.png",
+					"liarg_green_stone.png",
+					"liarg_green_stone.png",
+				},
+				"Liarg Stone",
+				"liarg_stone",
+				0
+			)
+
+			register_panel(
+				"liarg",
+				"stone",
+				"liarg:stone",
+				{cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_stone.png",
+					"liarg_green_stone.png",
+					"liarg_green_stone.png",
+				},
+				"Liarg Stone",
+				"liarg_stone",
+				0
+			)
+
+			register_micro(
+				"liarg",
+				"stone",
+				"liarg:stone",
+				{cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_stone.png",
+					"liarg_green_stone.png",
+					"liarg_green_stone.png",
+				},
+				"Liarg Stone",
+				"liarg_stone",
+				0
+			)
+
+			register_stair(
+				"liarg",
+				"tiles",
+				"liarg:tiles",
+				{cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+				},
+				"Liarg Tiles",
+				"liarg_tiles",
+				0
+			)
+
+			register_slab(
+				"liarg",
+				"tiles",
+				"liarg:tiles",
+				{cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+				},
+				"Liarg Tiles",
+				"liarg_tiles",
+				0
+			)
+
+
+			register_panel(
+				"liarg",
+				"tiles",
+				"liarg:tiles",
+				{ cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+				},
+				"Liarg Tiles",
+				"liarg_tiles",
+				0
+			)
+
+
+			register_micro(
+				"liarg",
+				"tiles",
+				"liarg:tiles",
+				{cracky=3, not_in_creative_inventory=1, not_in_craft_guide=1 },
+				{	"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+					"liarg_green_tiles.png",
+				},
+				"Liarg Tiles",
+				"liarg_tiles",
+				0
+			)
+	end
+
+

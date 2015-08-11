@@ -589,69 +589,61 @@ end)
 
 minetest.register_entity("protector:display", {
 physical = false,
-collisionbox = {0,0,0,0,0,0},
+collisionbox = {-4.5,-15.5,-4.5, 4.5,15.5,4.5},
 visual = "wielditem",
-visual_size = {x=1.0/1.5,y=1.0/1.5}, -- wielditem seems to be scaled to 1.5 times original node size
-textures = {"protector:display_node"},
+visual_size = {x=0.5,y=0.5}, -- wielditem seems to be scaled to 1.5 times original node size
+textures = {"air"},
+is_visible = true,
 on_step = function(self, dtime)
 	self.timer = (self.timer or 0) + dtime
 	if self.timer > 10 then
 		self.object:remove()
-	end
-	local nam = minetest.get_node(self.object:getpos()).name
-	if nam ~= "protector:protect" and nam ~= "protector:protect2" then
-		self.object:remove()
-		return
 	end
 end,
 })
 
 -- Display-zone node, Do NOT place the display as a node, it is made to be used as an entity (see above)
 local x = protector.radius
-minetest.register_node("protector:display_node", {
-	tiles = {"protector_display.png"},
-	use_texture_alpha = true,
-	walkable = false,
-	drawtype = "nodebox",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			-- sides
-			{-(x+.55), -(x+.55), -(x+.55), -(x+.45), (x+.55), (x+.55)},
-			{-(x+.55), -(x+.55), (x+.45), (x+.55), (x+.55), (x+.55)},
-			{(x+.45), -(x+.55), -(x+.55), (x+.55), (x+.55), (x+.55)},
-			{-(x+.55), -(x+.55), -(x+.55), (x+.55), (x+.55), -(x+.45)},
-			-- top
-			{-(x+.55), (x+.45), -(x+.55), (x+.55), (x+.55), (x+.55)},
-			-- bottom
-			{-(x+.55), -(x+.55), -(x+.55), (x+.55), -(x+.45), (x+.55)},
-			-- middle (surround protector)
-			{-.55,-.55,-.55, .55,.55,.55},
-		},
-	},
-	selection_box = {
-		type = "regular",
-	},
-	paramtype = "light",
-	groups = {dig_immediate=3,not_in_creative_inventory=1},
-	drop = "",
-})
+--minetest.register_node("protector:display_node", {
+--	tiles = {"protector_display.png"},
+--	use_texture_alpha = true,
+--	walkable = false,
+--	drawtype = "nodebox",
+--	node_box = {
+--		type = "fixed",
+--		fixed = {
+--			-- sides
+--			{-(x+.55), -(x+.55), -(x+.55), -(x+.45), (x+.55), (x+.55)},
+--			{-(x+.55), -(x+.55), (x+.45), (x+.55), (x+.55), (x+.55)},
+--			{(x+.45), -(x+.55), -(x+.55), (x+.55), (x+.55), (x+.55)},
+--			{-(x+.55), -(x+.55), -(x+.55), (x+.55), (x+.55), -(x+.45)},
+--			-- top
+--			{-(x+.55), (x+.45), -(x+.55), (x+.55), (x+.55), (x+.55)},
+--			-- bottom
+--			{-(x+.55), -(x+.55), -(x+.55), (x+.55), -(x+.45), (x+.55)},
+--			-- middle (surround protector)
+--			{-.55,-.55,-.55, .55,.55,.55},
+--		},
+--	},
+--	selection_box = {
+--		type = "regular",
+--	},
+--	paramtype = "light",
+--	groups = {dig_immediate=3,not_in_creative_inventory=1},
+--	drop = "",
+--})
 
 minetest.register_entity("protector:display2", {
 physical = false,
-collisionbox = {0,0,0,0,0,0},
+collisionbox = {-15.5,-15.5,-15.5, 15.5,15.5,15.5},
 visual = "wielditem",
-visual_size = {x=1.0/1.5,y=1.0/1.5}, -- wielditem seems to be scaled to 1.5 times original node size
-textures = {"protector:display2_node"},
+visual_size = {x=0.5,y=0.5}, -- wielditem seems to be scaled to 1.5 times original node size
+textures = {"air"},
+is_visible = true,
 on_step = function(self, dtime)
 	self.timer = (self.timer or 0) + dtime
 	if self.timer > 10 then
 		self.object:remove()
-	end
-	local nam = minetest.get_node(self.object:getpos()).name
-	if nam ~= "protector:protect" and nam ~= "protector:protect2" then
-		self.object:remove()
-		return
 	end
 end,
 })
@@ -659,34 +651,34 @@ end,
 -- Display-zone node, Do NOT place the display as a node, it is made to be used as an entity (see above)
 local xx = protector.radius
 local x = protector.radius_small
-minetest.register_node("protector:display2_node", {
-	tiles = {"protector_display.png"},
-	use_texture_alpha = true,
-	walkable = false,
-	drawtype = "nodebox",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			-- sides
-			{-(x+.55), -(xx+.55), -(x+.55), -(x+.45), (xx+.55), (x+.55)},
-			{-(x+.55), -(xx+.55), (x+.45), (x+.55), (xx+.55), (x+.55)},
-			{(x+.45), -(xx+.55), -(x+.55), (x+.55), (xx+.55), (x+.55)},
-			{-(x+.55), -(xx+.55), -(x+.55), (x+.55), (xx+.55), -(x+.45)},
-			-- top
-			{-(x+.55), (xx+.45), -(x+.55), (x+.55), (xx+.55), (x+.55)},
-			-- bottom
-			{-(x+.55), -(xx+.55), -(x+.55), (x+.55), -(xx+.45), (x+.55)},
-			-- middle (surround protector)
-			{-.55,-.55,-.55, .55,.55,.55},
-		},
-	},
-	selection_box = {
-		type = "regular",
-	},
-	paramtype = "light",
-	groups = {dig_immediate=3,not_in_creative_inventory=1},
-	drop = "",
-})
+--minetest.register_node("protector:display2_node", {
+--	tiles = {"protector_display.png"},
+--	use_texture_alpha = true,
+--	walkable = false,
+--	drawtype = "nodebox",
+--	node_box = {
+--		type = "fixed",
+--		fixed = {
+--			-- sides
+--			{-(x+.55), -(xx+.55), -(x+.55), -(x+.45), (xx+.55), (x+.55)},
+--			{-(x+.55), -(xx+.55), (x+.45), (x+.55), (xx+.55), (x+.55)},
+--			{(x+.45), -(xx+.55), -(x+.55), (x+.55), (xx+.55), (x+.55)},
+--			{-(x+.55), -(xx+.55), -(x+.55), (x+.55), (xx+.55), -(x+.45)},
+--			-- top
+--			{-(x+.55), (xx+.45), -(x+.55), (x+.55), (xx+.55), (x+.55)},
+--			-- bottom
+--			{-(x+.55), -(xx+.55), -(x+.55), (x+.55), -(xx+.45), (x+.55)},
+--			-- middle (surround protector)
+--			{-.55,-.55,-.55, .55,.55,.55},
+--		},
+--	},
+--	selection_box = {
+--		type = "regular",
+--	},
+--	paramtype = "light",
+--	groups = {dig_immediate=3,not_in_creative_inventory=1},
+--	drop = "",
+--})
 
 -- Register Protected Doors
 

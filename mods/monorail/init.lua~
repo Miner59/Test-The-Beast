@@ -169,7 +169,10 @@ function cart:on_punch(puncher, time_from_last_punch, tool_capabilities, directi
 	if not puncher or not puncher:is_player() then
 		return
 	end
-	
+	local whois=puncher:get_player_name()	
+	if whois==nil then
+		return
+	end
 	if puncher:get_player_control().sneak then
 		-- first partially drop driver from the cart, only then remove cart
 		if self.driver ~= nil then
@@ -178,9 +181,13 @@ function cart:on_punch(puncher, time_from_last_punch, tool_capabilities, directi
 		self.object:remove()
 		local inv = puncher:get_inventory()
 		local cart="monorail:cart" 
-		if minetest.setting_getbool("creative_mode") then
-			if not inv:contains_item("main", cart) then
+		if minetest.setting_getbool("creative_mode") or (whois~="singleplayer" and not minetest.check_player_privs(whois, {settime=true})) then 
+--only allow one cart for all players except admins to prevent players from taking to much carts
+			if not inv:contains_item("main", cart) and not inv:contains_item("craft", cart) then
 				inv:add_item("main", cart)
+				
+			elseif not minetest.setting_getbool("creative_mode")
+			minetest.chat_send_player(whois, "You are not allowed to take more carts!")
 			end
 		else
 			inv:add_item("main", cart)
@@ -615,7 +622,7 @@ function cart:on_step(dtime)
 		
 		
 		-- Increase or decrease speed on powerrail/brakerail  LATER!!!
-		if minetest.get_node(self.current_pos).name == "monorail:powerrail" or minetest.get_node(self.current_pos).name == "monorail:brakerail" then
+		if minetest.get_node(self.current_pos).name == "monorail:powerrail" or minetest.get_node(self.current_pos).name == "monorail:meserail" or minetest.get_node(self.current_pos).name == "monorail:brakerail" then
 			local accel=minetest.get_meta(pos):get_string("cart_acceleration")
 			if accel~=nil then
 				if tonumber(accel)~=nil then
@@ -890,18 +897,20 @@ local transportcart = {
 				end
 			end
 
-			if restored.lastpos ~= nil then
-				self.last_known_good_pos = restored.lastpos
-				self.object:moveto(self.last_known_good_pos)
-				--print(tostring(self) .. " restoring position: " .. dump(restored.lastpos))
-			end
-
-			if restored.velocity ~= nil then
-				self.last_speed = restored.velocity
-				self.object:setvelocity(self.last_speed)
-				--print(tostring(self) .. " restoring velocity: " .. dump(restored.velocity))
-			end
 		end
+	end,
+
+	get_staticdata = function(self)
+		local stacks = {}
+		local list = self.inventory:get_list("main")
+		for i=1,#list,1 do
+			table.insert(stacks,list[i]:to_string())
+		end
+		return minetest.serialize({
+		current_speed = self.current_speed,
+		current_direction = self.current_direction,
+		stacks=stacks,
+		})
 	end,
 
 	on_rightclick = function(self,clicker)
@@ -960,12 +969,6 @@ end
 
 }
 
-function transportcart:get_staticdata()
-	return minetest.serialize({
-		current_speed = self.current_speed,
-		current_direction = self.current_direction,
-	})
-end
 
 -- Remove the cart if holding a tool or accelerate it
 function transportcart:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)
@@ -1417,7 +1420,7 @@ function transportcart:on_step(dtime)
 		
 		
 		-- Increase or decrease speed on powerrail/brakerail  LATER!!!
-		if minetest.get_node(self.current_pos).name == "monorail:powerrail" or minetest.get_node(self.current_pos).name == "monorail:brakerail" then
+		if minetest.get_node(self.current_pos).name == "monorail:powerrail" or minetest.get_node(self.current_pos).name == "monorail:meserail" or minetest.get_node(self.current_pos).name == "monorail:brakerail" then
 			local accel=minetest.get_meta(pos):get_string("cart_acceleration")
 			if accel~=nil then
 				if tonumber(accel)~=nil then
@@ -1592,6 +1595,43 @@ minetest.register_node(":default:rail", {
 	groups = {bendy=2,cracky=1,rail=1,connect_to_raillike=1,level=2},
 })
 
+minetest.register_node("monorail:meserail", { --like powerrail, but always powered and with a bit more acceleration
+	description = "MESE Rail",
+	drawtype = "raillike",
+	tiles = {"monorail_rail_mese.png", "monorail_rail_curved_mese.png", "monorail_rail_t_junction_mese.png", "monorail_rail_crossing_mese.png"},
+	inventory_image = "monorail_rail_mese.png",
+	wield_image = "monorail_rail_mese.png",
+	paramtype = "light",
+	is_ground_content = true,
+	walkable = false,
+	selection_box = {
+		type = "fixed",
+		-- but how to specify the dimensions for curved and sideways rails?
+		fixed = {-1/2, -1/2, -1/2, 1/2, -1/2+1/16, 1/2},
+	},
+	groups = {bendy=2,cracky=1,rail=1,connect_to_raillike=1,level=2},
+	
+	can_dig = function(pos,player)
+		local meta = minetest.env:get_meta(pos);
+		local name=player:get_player_name()
+		if player==nil then return false end
+		if minetest.check_player_privs(name, {settime=true}) then
+			return true
+		end
+		if meta==nil then return false end
+		return meta:get_string("owner")~=""
+		
+	end,
+	after_place_node = function(pos, placer, itemstack)
+		if placer:get_player_name()~=nil then
+			if not minetest.check_player_privs(placer:get_player_name(), {settime=true}) then
+				minetest.get_meta(pos):set_string("owner", placer:get_player_name())
+			end
+		end
+		minetest.get_meta(pos):set_string("cart_acceleration", "2.32")
+	end,
+})
+
 minetest.register_node("monorail:powerrail", {
 	description = "Powered Rail",
 	drawtype = "raillike",
@@ -1731,6 +1771,15 @@ minetest.register_craft({
     }
 })
 
+
+	minetest.register_craft({
+		output = "monorail:meserail 16",
+		recipe = {
+			{"default:mese_crystal", "", "default:mese_crystal"},
+			{"default:mese_crystal", "group:stick", "default:mese_crystal"},
+			{"default:mese_crystal", "", "default:mese_crystal"},
+		}
+	})
 
 	minetest.register_craft({
 		output = "monorail:powerrail 2",

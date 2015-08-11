@@ -587,12 +587,13 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 	end
 end)
 
-minetest.register_entity("protector:display", {
+minetest.register_entity("protector:display2", {
 physical = false,
-collisionbox = {0,0,0,0,0,0},
+collisionbox = {-4.5,-15.5,-4.5, 4.5,15.5,4.5},
 visual = "wielditem",
-visual_size = {x=1.0/1.5,y=1.0/1.5}, -- wielditem seems to be scaled to 1.5 times original node size
-textures = {"protector:display_node"},
+visual_size = {x=0.5,y=0.5}, -- wielditem seems to be scaled to 1.5 times original node size
+textures = {"protector:display2_node"},
+is_visible = true,
 on_step = function(self, dtime)
 	self.timer = (self.timer or 0) + dtime
 	if self.timer > 10 then
@@ -632,12 +633,13 @@ minetest.register_node("protector:display_node", {
 	drop = "",
 })
 
-minetest.register_entity("protector:display2", {
+minetest.register_entity("protector:display", {
 physical = false,
-collisionbox = {0,0,0,0,0,0},
+collisionbox = {-15.5,-15.5,-15.5, 15.5,15.5,15.5},
 visual = "wielditem",
-visual_size = {x=1.0/1.5,y=1.0/1.5}, -- wielditem seems to be scaled to 1.5 times original node size
-textures = {"protector:display2_node"},
+visual_size = {x=0.5,y=0.5}, -- wielditem seems to be scaled to 1.5 times original node size
+textures = {"protector:display_node"},
+is_visible = true,
 on_step = function(self, dtime)
 	self.timer = (self.timer or 0) + dtime
 	if self.timer > 10 then

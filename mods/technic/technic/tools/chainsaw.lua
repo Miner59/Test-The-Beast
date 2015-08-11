@@ -153,12 +153,19 @@ technic.register_power_tool("technic:chainsaw", chainsaw_max_charge)
 
 -- Table for saving what was sawed down
 local produced = {}
+local sapling=""
 
 -- Save the items sawed down so that we can drop them in a nice single stack
-local function handle_drops(drops)
+local function handle_drops(drops,plant)
 	for _, item in ipairs(drops) do
 		local stack = ItemStack(item)
 		local name = stack:get_name()
+		if plant then
+		if minetest.get_item_group(name, "sapling")>0 then
+			sapling=name
+			return
+		end
+		end
 --dont give snow stacks, just remove snow from sky
 		if name~="default:snowblock" and name~="default:snow" then 
 --give only a few leaves
@@ -283,7 +290,7 @@ end
 
 -- This function does all the hard work. Recursively we dig the node at hand
 -- if it is in the table and then search the surroundings for more stuff to dig.
-local function recursive_dig(pos, remaining_charge,sneak)
+local function recursive_dig(pos, remaining_charge,sneak,plant)
 	if remaining_charge < chainsaw_charge_per_node then
 		return remaining_charge
 	end
@@ -309,9 +316,12 @@ end
 		timber_nodenames["default:snowblock"]        = true
 		timber_nodenames["default:snow"]             = true
 	end
+	if plant and sapling~="" then
+		plant=false
+	end
 
 	-- Wood found - cut it
-	handle_drops(minetest.get_node_drops(node.name, ""))
+	handle_drops(minetest.get_node_drops(node.name, ""),plant)
 	minetest.remove_node(pos)
 	remaining_charge = remaining_charge - chainsaw_charge_per_node
 
@@ -322,12 +332,12 @@ end
 		end
 if sneak then
 		if selected_nodes[minetest.get_node(npos).name] then
-			remaining_charge = recursive_dig(npos, remaining_charge,sneak)
+			remaining_charge = recursive_dig(npos, remaining_charge,sneak,plant)
 		end
 
 else
 		if timber_nodenames[minetest.get_node(npos).name] then
-			remaining_charge = recursive_dig(npos, remaining_charge,sneak)
+			remaining_charge = recursive_dig(npos, remaining_charge,sneak,plant)
 		end
 	end
 end
@@ -372,10 +382,40 @@ end
 local function chainsaw_dig(pos, current_charge,sneak)
 	-- Start sawing things down
 
-	local remaining_charge = recursive_dig(pos, current_charge,sneak)
-	minetest.sound_play("chainsaw", {pos = pos, gain = 1.0,
+	local remaining_charge=current_charge
+	local plant=false
+	if current_charge~=50000 then
+		minetest.sound_play("chainsaw", {pos = pos, gain = 1.0,
 			max_hear_distance = 10})
+	else
+		local under=minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name
+		if under=="default:dirt" or under=="paragenv7:drygrass" or under=="paragenv7:grass" or under=="paragenv7:permafrost" or under=="paragenv7:dirt" or under=="default:dirt_with_grass" or under=="default:sand" or under=="default:desert_sand" or under=="default:snowblock" or under=="default:dirt_with_snow" then
+			plant=true 
+		else
+			local nt=0
+			under=minetest.get_node({x=pos.x-1,y=pos.y-1,z=pos.z}).name
+		if not (under=="default:dirt" or under=="paragenv7:drygrass" or under=="paragenv7:grass" or under=="paragenv7:permafrost" or under=="paragenv7:dirt" or under=="default:dirt_with_grass" or under=="default:sand" or under=="default:desert_sand" or under=="default:snowblock" or under=="default:dirt_with_snow") then
+				nt=nt+1
+			end
+			under=minetest.get_node({x=pos.x+1,y=pos.y-1,z=pos.z}).name
+		if not (under=="default:dirt" or under=="paragenv7:drygrass" or under=="paragenv7:grass" or under=="paragenv7:permafrost" or under=="paragenv7:dirt" or under=="default:dirt_with_grass" or under=="default:sand" or under=="default:desert_sand" or under=="default:snowblock" or under=="default:dirt_with_snow") then
+				nt=nt+1
+			end
+			under=minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z-1}).name
+		if not (under=="default:dirt" or under=="paragenv7:drygrass" or under=="paragenv7:grass" or under=="paragenv7:permafrost" or under=="paragenv7:dirt" or under=="default:dirt_with_grass" or under=="default:sand" or under=="default:desert_sand" or under=="default:snowblock" or under=="default:dirt_with_snow") then
+				nt=nt+1
+			end
 
+			under=minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z+1}).name
+		if not (under=="default:dirt" or under=="paragenv7:drygrass" or under=="paragenv7:grass" or under=="paragenv7:permafrost" or under=="paragenv7:dirt" or under=="default:dirt_with_grass" or under=="default:sand" or under=="default:desert_sand" or under=="default:snowblock" or under=="default:dirt_with_snow") then
+				nt=nt+1
+			end
+			if nt<2 then
+			plant=true 
+			end
+		end
+	end
+	remaining_charge= recursive_dig(pos, current_charge,sneak,plant)
 	-- Now drop items for the player
 	for name, stack in pairs(produced) do
 		-- Drop stacks of stack max or less
@@ -391,6 +431,10 @@ local function chainsaw_dig(pos, current_charge,sneak)
 
 	-- Clean up
 	produced = {}
+	if plant and sapling~="" then
+		minetest.set_node(pos, {name=sapling})
+		sapling=""	
+	end
 
 	timber_nodenames["default:snowblock"]        = false
 	timber_nodenames["default:snow"]             = false
@@ -453,9 +497,10 @@ elseif treename=="moretrees:apple_tree_trunk" or treename== "moretrees:apple_tre
 selected_nodes["moretrees:apple_tree_trunk"]       = true
 selected_nodes["moretrees:apple_tree_leaves"]       = true
 selected_nodes["default:apple"]       = true
-elseif treename=="moretrees:fir_trunk" or treename=="moretrees:fire_leaves" or treename=="moretrees:fire_cone" then
+elseif treename=="moretrees:fir_trunk" or treename=="moretrees:fire_leaves" or treename=="moretrees:fire_leaves_bright" or treename=="moretrees:fire_cone" then
 selected_nodes["moretrees:fir_trunk"]       = true
 selected_nodes["moretrees:fir_leaves"]       = true
+selected_nodes["moretrees:fir_leaves_bright"]       = true
 selected_nodes["moretrees:fir_cone"]                 = true
 elseif treename=="moretrees:oak_trunk" or treename=="moretrees:oak_leaves" or treename=="moretrees:acorn" then
 selected_nodes["moretrees:oak_trunk"]       = true
@@ -539,6 +584,140 @@ end
 	end,
 })
 
+minetest.register_tool(":moreores:chopping_axe", {
+	description = S("Chopping Axe"),
+	inventory_image = "chopping_axe.png",
+	stack_max = 1,
+	on_use = function(itemstack, user, pointed_thing)
+		if pointed_thing.type ~= "node" then
+			return itemstack
+		end
+		local nodename=minetest.get_node(pointed_thing.under).name
+		if not timber_nodenames[nodename] then
+			return
+		end
+
+		local name = user:get_player_name()
+		if minetest.is_protected(pointed_thing.under, name) then
+			minetest.record_protection_violation(pointed_thing.under, name)
+			return
+		end
+		local keys = user:get_player_control()
+		local sneak=keys["sneak"] 
+selected_nodes={}
+if sneak then
+local treename = nodename
+selected_nodes={
+	[treename]       = true,
+}
+if not chainsaw_leaves then
+if treename=="moretrees:rubber_tree_trunk_empty" or treename=="moretrees:rubber_tree_trunk" then
+selected_nodes={
+	["moretrees:rubber_tree_trunk_empty"] = true,
+	["moretrees:rubber_tree_trunk"]       = true,
+}
+end
+else
+if treename=="default:tree" or treename=="default:leaves" or treename=="default:apple" or treename=="paragenv7:appleleaf" then
+selected_nodes["default:tree"]       = true
+selected_nodes["default:leaves"]       = true
+selected_nodes["default:apple"]       = true
+selected_nodes["paragenv7:appleleaf"]       = true
+elseif treename=="default:jungletree" or treename=="default:jungleleaves" or treename=="paragenv7:jungleleaf" then
+selected_nodes["default:jungletree"]       = true
+selected_nodes["default:jungleleaves"]       = true
+selected_nodes["paragenv7:jungleleaf"]       = true
+elseif treename=="moretrees:apple_tree_trunk" or treename== "moretrees:apple_tree_leaves" then
+selected_nodes["moretrees:apple_tree_trunk"]       = true
+selected_nodes["moretrees:apple_tree_leaves"]       = true
+selected_nodes["default:apple"]       = true
+elseif treename=="moretrees:fir_trunk" or treename=="moretrees:fire_leaves" or treename=="moretrees:fire_leaves_bright" or treename=="moretrees:fire_cone" then
+selected_nodes["moretrees:fir_trunk"]       = true
+selected_nodes["moretrees:fir_leaves"]       = true
+selected_nodes["moretrees:fir_leaves_bright"]       = true
+selected_nodes["moretrees:fir_cone"]                 = true
+elseif treename=="moretrees:oak_trunk" or treename=="moretrees:oak_leaves" or treename=="moretrees:acorn" then
+selected_nodes["moretrees:oak_trunk"]       = true
+selected_nodes["moretrees:oak_leaves"]       = true
+selected_nodes["moretrees:acorn"]  		       = true
+elseif treename=="moretrees:sequoia_trunk" or treename=="moretrees:sequoia_leaves" then
+selected_nodes["moretrees:sequoia_trunk"]       = true
+selected_nodes["moretrees:sequoia_leaves"]       = true
+elseif treename=="moretrees:birch_trunk" or treename=="moretrees:birch_leaves" then
+selected_nodes["moretrees:birch_trunk"]       = true
+selected_nodes["moretrees:birch_leaves"]       = true
+elseif treename=="moretrees:beech_trunk" or treename=="moretrees:beech_leaves" then
+selected_nodes["moretrees:beech_trunk"]       = true
+selected_nodes["moretrees:beech_leaves"]       = true
+elseif treename=="moretrees:palm_trunk" or treename=="moretrees:palm_leaves" or treename=="moretrees:coconut" then
+selected_nodes["moretrees:palm_trunk"]       = true
+selected_nodes["moretrees:palm_leaves"]       = true
+selected_nodes["moretrees:coconut"]                  = true
+elseif treename=="moretrees:spruce_trunk" or treename=="moretrees:spruce_leaves"or  treename=="moretrees:spruce_cone" then
+selected_nodes["moretrees:spruce_trunk"]       = true
+selected_nodes["moretrees:spruce_leaves"]       = true
+selected_nodes["moretrees:spruce_cone"]              = true
+elseif treename=="moretrees:pine_trunk" or treename=="moretrees:pine_leaves" or treename=="moretrees:pine_cone" then
+selected_nodes["moretrees:pine_trunk"]       = true
+selected_nodes["moretrees:pine_leaves"]       = true
+selected_nodes["moretrees:pine_cone"]                = true
+elseif treename=="moretrees:willow_trunk" or treename=="moretrees:willow_leaves" then
+selected_nodes["moretrees:willow_trunk"]       = true
+selected_nodes["moretrees:willow_leaves"]       = true
+elseif treename=="moretrees:jungletree_trunk" or treename=="moretrees:jungletree_leaves_yellow" or treename=="moretrees:jungletree_leaves_green" or treename=="moretrees:jungletree_leaves_red" then
+selected_nodes["moretrees:jungletree_trunk"]       = true
+selected_nodes["moretrees:jungletree_leaves_green"]       = true
+selected_nodes["moretrees:jungletree_leaves_yellow"]       = true
+selected_nodes["moretrees:jungletree_leaves_red"]       = true
+elseif treename=="moretrees:rubber_tree_trunk" or treename=="moretrees:rubber_tree_trunk_empty" or treename=="moretrees:rubber_tree_leaves" then
+selected_nodes["moretrees:rubber_tree_trunk"]       = true
+selected_nodes["moretrees:rubber_tree_trunk_empty"]       = true
+selected_nodes["moretrees:rubber_tree_leaves"]       = true
+elseif treename=="paragenv7:acaciatree" or treename=="paragenv7:acacialeaf" then
+selected_nodes["paragenv7:acaciatree"]       = true
+selected_nodes["paragenv7:acacialeaf"]       = true
+elseif treename=="paragenv7:pinetree" or treename=="paragenv7:needles" then
+selected_nodes["paragenv7:pinetree"]       = true
+selected_nodes["paragenv7:needles"]       = true
+selected_nodes["default:snowblock"]        = true
+selected_nodes["default:snow"]             = true
+end
+end
+end
+
+		timber_nodenames["moretrees:apple_tree_leaves"]        = true
+		timber_nodenames["moretrees:oak_leaves"]               = true
+		timber_nodenames["moretrees:fir_leaves"]               = true
+		timber_nodenames["moretrees:fir_leaves_bright"]        = true
+		timber_nodenames["moretrees:sequoia_leaves"]           = true
+		timber_nodenames["moretrees:birch_leaves"]             = true
+		timber_nodenames["moretrees:birch_leaves"]             = true
+		timber_nodenames["moretrees:palm_leaves"]              = true
+		timber_nodenames["moretrees:spruce_leaves"]            = true
+		timber_nodenames["moretrees:spruce_leaves"]            = true
+		timber_nodenames["moretrees:pine_leaves"]              = true
+		timber_nodenames["moretrees:willow_leaves"]            = true
+		timber_nodenames["moretrees:jungletree_leaves_green"]  = true
+		timber_nodenames["moretrees:jungletree_leaves_yellow"] = true
+		timber_nodenames["moretrees:jungletree_leaves_red"]    = true
+--cut this fruits down too
+		timber_nodenames["moretrees:acorn"]  		       = true
+		timber_nodenames["moretrees:coconut"]                  = true
+		timber_nodenames["moretrees:pine_cone"]                = true
+		timber_nodenames["moretrees:fir_cone"]                 = true
+		timber_nodenames["moretrees:spruce_cone"]              = true
+
+
+		-- Send current charge to digging function so that the
+		-- chainsaw will stop after digging a number of nodes
+		local chopped = 50000-chainsaw_dig(pointed_thing.under, 50000, sneak)
+if chopped>40 then
+		itemstack:set_wear(itemstack:get_wear()+150)
+end
+		return itemstack
+	end,
+})
+
 minetest.register_craft({
         output = 'technic:chainsaw',
         recipe = {
@@ -547,4 +726,24 @@ minetest.register_craft({
                 {'',                               '',                             'default:copper_ingot'},
         }
 })
+
+minetest.register_craft({
+        output = 'moreores:chopping_axe',
+        recipe = {
+                {'moreores:mithril_block', 'moreores:mithril_block',''},
+                {'moreores:mithril_block','group:stick',''},
+                {'','group:stick',''},
+        }
+})
+
+minetest.register_craft({
+        output = 'moreores:chopping_axe',
+        recipe = {
+                {'', 'moreores:mithril_block', 'moreores:mithril_block'},
+                {'','group:stick','moreores:mithril_block'},
+                {'','group:stick',''},
+        }
+})
+
+minetest.register_alias("chopping_axe", "moreores:chopping_axe")
 

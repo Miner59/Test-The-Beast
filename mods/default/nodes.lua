@@ -130,6 +130,16 @@ minetest.register_node("default:dirt", {
 })
 
 minetest.register_abm({
+	nodenames = {"monorail:meserail"},
+	interval = 5,
+	chance = 1,
+	action = function(pos, node)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("cart_acceleration", "2.32")
+	end
+})
+
+minetest.register_abm({
 	nodenames = {"default:cloud"},
 	interval = 100,
 	chance = 200,

@@ -378,7 +378,7 @@ minetest.register_craft( {
 	output = "moreores:sword_mithril",
 	recipe = {
 		{"moreores:mithril_ingot"},
-		{"group:stick"},
+		{"moreores:mithril_ingot"},
 		{"group:stick"}
 	}
 })
@@ -387,7 +387,7 @@ minetest.register_craft( {
 	output = "moreores:sword_silver",
 	recipe = {
 		{"moreores:silver_ingot"},
-		{"group:stick"},
+		{"moreores:silver_ingot"},
 		{"group:stick"}
 	}
 })

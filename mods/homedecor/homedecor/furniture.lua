@@ -168,7 +168,7 @@ local function reg_lamp(suffix, nxt, desc, tilesuffix, light)
 	minetest.register_alias("3dforniture:table_lamp_"..suffix, "homedecor:table_lamp_"..suffix)
 end
 
-local tmp = {}
+itmp = {}
 
 minetest.register_entity("homedecor:item",{
 	hp_max = 1,
@@ -178,11 +178,11 @@ minetest.register_entity("homedecor:item",{
 	physical=false,
 	textures={"air"},
 	on_activate = function(self, staticdata)
-		if tmp.nodename ~= nil and tmp.texture ~= nil then
-			self.nodename = tmp.nodename
-			tmp.nodename = nil
-			self.texture = tmp.texture
-			tmp.texture = nil
+		if itmp.nodename ~= nil and itmp.texture ~= nil then
+			self.nodename = itmp.nodename
+			itmp.nodename = nil
+			self.texture = itmp.texture
+			itmp.texture = nil
 		else
 			if staticdata ~= nil and staticdata ~= "" then
 				local data = staticdata:split(';')
@@ -196,7 +196,7 @@ minetest.register_entity("homedecor:item",{
 		if self.texture ~= nil then
 			self.object:set_properties({textures={self.texture}})
 		end
-		if self.nodename == "homedecor:pedestal" then
+		if self.nodename == "homedecor:pedestal" or self.nodename == "kpgmobs:manger" then
 			self.object:set_properties({automatic_rotate=1})
 		end
 	end,
@@ -219,7 +219,7 @@ local remove_item = function(pos, node)
 	local objs = nil
 	if node.name == "homedecor:frame" then
 		objs = minetest.env:get_objects_inside_radius(pos, .5)
-	elseif node.name == "homedecor:pedestal" then
+	elseif node.name == "homedecor:pedestal" or node.name=="kpgmobs:manger" then
 		objs = minetest.env:get_objects_inside_radius({x=pos.x,y=pos.y+1,z=pos.z}, .5)
 	end
 	if objs then
@@ -241,12 +241,16 @@ local update_item = function(pos, node)
 			pos.x = pos.x + posad.x*6.5/16
 			pos.y = pos.y + posad.y*6.5/16
 			pos.z = pos.z + posad.z*6.5/16
-		tmp.nodename = node.name
-		tmp.texture = ItemStack(meta:get_string("item")):get_name()
+		itmp.nodename = node.name
+		itmp.texture = ItemStack(meta:get_string("item")):get_name()
 		elseif node.name == "homedecor:pedestal" then
 			pos.y = pos.y + 12/16+.33
-		tmp.nodename = node.name
-		tmp.texture = ItemStack(meta:get_string("item")):get_name()
+		itmp.nodename = node.name
+		itmp.texture = ItemStack(meta:get_string("item")):get_name()
+		elseif node.name == "kpgmobs:manger" then
+			pos.y = pos.y + 0.65
+		itmp.nodename = node.name
+		itmp.texture = ItemStack(meta:get_string("item")):get_name()
 		end
 		local e = minetest.env:add_entity(pos,"homedecor:item")
 		if node.name == "homedecor:frame"  then
@@ -365,7 +369,7 @@ minetest.register_node("homedecor:pedestal",{
 -- due to /clearobjects or similar
 
 minetest.register_abm({
-	nodenames = { "homedecor:frame","kpgmobs:antlers", "homedecor:pedestal" },
+	nodenames = { "homedecor:frame","kpgmobs:antlers", "homedecor:pedestal", "kpgmobs:manger" },
 	interval = 600,
 	chance = 1,
 	action = function(pos, node, active_object_count, active_object_count_wider)

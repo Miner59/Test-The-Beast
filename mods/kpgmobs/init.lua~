@@ -37,8 +37,51 @@ minetest.register_node("kpgmobs:manger", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
-	groups = {oddly_diggable_by_hand=2},
+	groups = {oddly_breakable_by_hand=2},
 	sounds = default.node_sound_defaults(),
+	on_rightclick = function(pos, node, clicker, itemstack)
+		if not itemstack then return end
+		local meta = minetest.env:get_meta(pos)
+			if meta:get_string("item") ==nil or meta:get_string("item")=="" then
+			if itemstack:get_name()=="default:apple" or itemstack:get_name()=="farming:wheat" or itemstack:get_name()=="farming:seed_wheat" then
+			local s = itemstack:take_item()
+			meta:set_string("item",s:to_string())
+			pos.y = pos.y + 0.65
+			itmp.nodename = node.name
+			itmp.texture = ItemStack(meta:get_string("item")):get_name()
+			local e = minetest.env:add_entity(pos,"homedecor:item")
+			end
+			end
+		return itemstack
+	end,
+	on_punch = function(pos,node,puncher)
+		local meta = minetest.env:get_meta(pos)
+		local item = meta:get_string("item")
+		if puncher~=nil and item~=nil and item~="" then
+			local name=puncher:get_player_name()
+			if not minetest.is_protected(pos,name) then
+			local inv=puncher:get_inventory()
+			if inv~=nil then
+				if inv:room_for_item("main", ItemStack(item)) then
+					inv:add_item("main", ItemStack(item))
+					meta:set_string("item","")
+
+	local objs = nil
+		objs = minetest.env:get_objects_inside_radius({x=pos.x,y=pos.y+0.8,z=pos.z}, .5)
+	if objs then
+		for _, obj in ipairs(objs) do
+			if obj and obj:get_luaentity() and obj:get_luaentity().name == "homedecor:item" then
+				obj:remove()
+			end
+		end
+	end
+
+				end
+			end
+			end
+		end		
+	end,
+
 })
 
 minetest.register_craft({
@@ -1050,6 +1093,17 @@ minetest.register_globalstep(function(dtime)
 							end
 						end
 						if boots==nil then
+						local ffound=0
+						if inv:get_list("armor")~=nil then
+							for i,stack in ipairs(inv:get_list("armor")) do
+								if string.sub(stack:get_name(), 0, 21) == "kpgmobs:leather_boots" then
+									players[name]["boots"]=i
+									boots=i
+									itemstack=stack
+								end
+							end
+						end
+						if found==0 then
 						if inv:get_list("main")~=nil then
 							for i,stack in ipairs(inv:get_list("main")) do
 								if string.sub(stack:get_name(), 0, 21) == "kpgmobs:leather_boots" then
@@ -1060,9 +1114,27 @@ minetest.register_globalstep(function(dtime)
 							end
 						end
 						end
+						end
 					elseif default.player_attached[name] ~= true then
 						local inv=player:get_inventory()
 						local ffound=0
+						for i,stack in ipairs(inv:get_list("armor")) do
+							if string.sub(stack:get_name(), 0, 19) == "technic:diving_gear" then
+								local itemstack=stack
+								local wear=itemstack:get_wear()
+								if wear+56 > 65535 then
+									player:get_inventory():set_stack("armor",i,ItemStack("technic:diving_gear_empty"))
+								else
+									players[name]["diving"]=i
+									player:set_breath(10);
+									itemstack:set_wear (wear+70) --should allow ~20 minutes diving
+									player:get_inventory():set_stack("armor",i,itemstack)
+								end
+								ffound=1
+								break
+							end
+						end
+						if ffound==0 then
 						for i,stack in ipairs(inv:get_list("craft")) do
 							if string.sub(stack:get_name(), 0, 19) == "technic:diving_gear" then
 								local itemstack=stack
@@ -1099,6 +1171,7 @@ minetest.register_globalstep(function(dtime)
 						end
 						if ffound==0 then
 							players[name]["diving"]=0
+						end
 						end
 						end
 					end

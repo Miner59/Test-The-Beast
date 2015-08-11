@@ -70,9 +70,10 @@ minetest.register_tool("technic:vacuum", {
 				if sneak then
 					for i=1,inv2:get_size("main"),1 do
 						local stack=inv2:get_stack("main", i)
-						if stack:get_count() > 0 then
+						if stack:get_count() > 0 and inv3:room_for_item(stack) then
 							inv3:add_item("main", ItemStack(stack))
 							inv2:set_stack("main", i,ItemStack(nil))
+							meta.full=nil
 						end
 					end			
 				else
@@ -185,6 +186,7 @@ minetest.register_tool("technic:vacuum", {
 					if stack:get_count() > 0 then
 						inv:add_item("main", ItemStack(stack))
 						inv2:set_stack("main", i,ItemStack(nil))
+						meta.full=nil
 					end
 				else
 					break

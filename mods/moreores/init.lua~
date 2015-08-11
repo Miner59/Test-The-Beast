@@ -416,7 +416,7 @@ minetest.register_node("moreores:copper_rail", {
 			return true
 		end
 		if meta==nil then return false end
-		return meta:get_string("owner")==""
+		return meta:get_string("owner")~=""
 		
 	end,
 	after_place_node = function(pos, placer, itemstack)

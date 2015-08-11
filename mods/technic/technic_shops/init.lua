@@ -664,11 +664,13 @@ end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local name=player:get_player_name()
-	if string.sub(formname,1,21+string.len(name))=="default:traders_scale"..name then
-local x=tonumber(string.sub(formname,22+string.len(name),27+string.len(name)))
-local y=tonumber(string.sub(formname,28+string.len(name),33+string.len(name)))
-local z=tonumber(string.sub(formname,34+string.len(name),39+string.len(name)))
+
+	if string.sub(formname,1,27+string.len(name))=="technic_shops:traders_scale"..name then
+local x=tonumber(string.sub(formname,28+string.len(name),33+string.len(name)))
+local y=tonumber(string.sub(formname,34+string.len(name),39+string.len(name)))
+local z=tonumber(string.sub(formname,40+string.len(name),45+string.len(name)))
 local pos={x=x,y=y,z=z}
+
 	local meta = minetest.env:get_meta(pos)
 	local inv = meta:get_inventory()
 	if name==meta:get_string("owner") and fields["mode"] then
@@ -743,7 +745,7 @@ local zz=string.sub("      "..tostring(pos.z),string.len(tostring(pos.z))+1,6+st
 
 			minetest.show_formspec(
 				name,
-				"default:traders_scale"..name..xx..yy..zz,
+				"technic_shops:traders_scale"..name..xx..yy..zz,
 				technic_shops.traders_scale_formspec(meta,name)
 			)
 --		end,meta,pos,name)
